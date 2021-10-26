@@ -12,4 +12,6 @@ A set of tools have already been implemented in the software. Some are cited bel
 ### CAD Exchange
 Read and Write CAD files. The supported standard formats are STEP, STL, OBJ and BREP.
 ### Rotate & Move
-In CoffaViewer Geometries can be transformed (i.e. rotation & translation) by using interactive tools. The transformed shape can be exported into the same or a different format. 
+In CoffaViewer Geometries can be transformed (i.e. rotation & translation) by using interactive tools. The transformed shape can be exported into the same or a different format.
+### 3D Printing Tools
+
