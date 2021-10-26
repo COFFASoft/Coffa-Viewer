@@ -1,13 +1,13 @@
 #pragma once
 
-//#include "Doc.h"
-//#include "View.h"
+#include "Doc.h"
+#include "View.h"
 
 //Opencascade
-//#include <StlAPI.hxx>
-//#include <StlAPI_Reader.hxx>
-//#include <RWStl.hxx>
-//#include <TopoDS_Shape.hxx>
+#include <StlAPI.hxx>
+#include <StlAPI_Reader.hxx>
+#include <RWStl.hxx>
+#include <TopoDS_Shape.hxx>
 
 
 //Qt
@@ -37,11 +37,6 @@
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QVBoxlayout>
 #include <QtWidgets/QStackedLayout>
-#include <QtDataVisualization/qdatavisualizationglobal.h>
-#include <QtCharts/qbarseries.h>
-#include <QtCharts/QBarCategoryAxis>
-#include <QtCharts/QValueAxis>
-#include <QtCharts/QLineSeries>
 #include <QtWidgets/QListView>
 #include <QtWidgets/qtoolbutton.h>
 #include <QtWidgets/QRadioButton>
@@ -51,14 +46,6 @@
 #include <QtWidgets\QTreeView>
 #include <QtCore/QStringListModel>
 #include <QtWidgets/qdial.h>
-#include <QtCharts/QChartView>
-
-
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonParseError>
-#include <QtCore/QJsonValue>
 
 
 class CoffaViewer : public QMainWindow
@@ -70,14 +57,17 @@ public:
 	void onSetPalette();
 	void createTabsOfTools();
 
-	void						ReadProject(QString aProj);
+	virtual Doc*				createNewDocument();
+	View*						getViewer();
 	void						createViewActions();
 	void						fitAll();
-	//View*						getViewer();
+	
 
 	void						viewPtBProp();
 
 private:
+	Doc* aDoc;
+	View* myView;
 	QFrame* mainFrame;
 	QPalette thePalette;
 };

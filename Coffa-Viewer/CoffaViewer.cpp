@@ -8,7 +8,7 @@ CoffaViewer::CoffaViewer(QWidget *parent)
 {
 	QIcon iconApp;
 	iconApp.addPixmap(QPixmap(QString::fromUtf8(":/Coffa-Viewer/Resources/AppCof.png")), QIcon::Normal, QIcon::Off);
-	setWindowIcon(iconApp);
+	this->setWindowIcon(iconApp);
 	mainFrame = new QFrame(this);
 	QVBoxLayout* layout = new QVBoxLayout(mainFrame);
 	layout->setMargin(0);
@@ -17,6 +17,17 @@ CoffaViewer::CoffaViewer(QWidget *parent)
 	onSetPalette();
 	setStyleSheet("QToolTip{background-color: white;border: 1px solid rgba(73, 84, 100,1); border-radius:4px}");
 
+
+	//Embedding 3D Viewer
+
+	aDoc = createNewDocument();
+
+	myView = new View(aDoc->getContext(), mainFrame);
+	layout->addWidget(myView);
+
+	connect(myView, SIGNAL(PartClicked(int)), this, SLOT(getViewClicked()));
+	connect(myView, SIGNAL(GridClick(int)), this, SLOT(ActivatetheGrid()));
+	connect(myView, SIGNAL(GridClick2(int)), this, SLOT(DeActivatetheGrid()));
 }
 
 void CoffaViewer::onSetPalette()
@@ -47,18 +58,14 @@ void CoffaViewer::onSetPalette()
 
 
 	setStyleSheet("QMenu{background-color: white; border:1px solid rgba(73, 84, 100,1);border-radius:4px}");
-
 	setStyleSheet("QToolTip{background-color: white;border: 1px solid rgba(73, 84, 100,1); border-radius:4px}");
 
 	qApp->setPalette(thePalette);
+
 }
 
 
 void CoffaViewer::createTabsOfTools()
-{
-}
-
-void CoffaViewer::ReadProject(QString aProj)
 {
 }
 
@@ -70,10 +77,15 @@ void CoffaViewer::fitAll()
 {
 }
 
-//View* CoffaViewer::getViewer()
-//{
-//    return nullptr;
-//}
+Doc* CoffaViewer::createNewDocument()
+{
+	return new Doc(this);
+}
+
+View* CoffaViewer::getViewer()
+{
+    return myView;
+}
 
 void CoffaViewer::viewPtBProp()
 {

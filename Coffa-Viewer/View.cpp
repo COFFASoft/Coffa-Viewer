@@ -4,8 +4,6 @@
 #endif
 
 #include "View.h"
-//#include "Coffa.h"
-#include <qdebug.h>
 
 #include <QtWidgets/QApplication>
 #include <QtGui/QPainter>
@@ -132,7 +130,7 @@ void View::init()
     myView->SetBackgroundColor(Quantity_NOC_BLACK);
     myView->MustBeResized();
     myView->ZBufferTriedronSetup(Quantity_NOC_RED, Quantity_NOC_GREEN, Quantity_NOC_BLUE1, 0.8, 0.05, 12);
-    myView->TriedronDisplay(Aspect_TOTP_RIGHT_UPPER, Quantity_NOC_BLACK, 0.085, V3d_ZBUFFER);
+    myView->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_BLACK, 0.12, V3d_ZBUFFER);
 
 
     if (myIsRaytracing)
