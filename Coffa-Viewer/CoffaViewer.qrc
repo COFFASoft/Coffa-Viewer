@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/CoffaViewer">
+        <file>Resources/AppCof.png</file>
+    </qresource>
+</RCC>

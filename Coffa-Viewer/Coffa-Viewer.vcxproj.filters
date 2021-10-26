@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="CoffaViewer.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="View.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Doc.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="InteractiveShape.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OcctWindow.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="CF_Triangle.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="InteractiveSurface.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{4d0289f0-068e-4211-abbd-e1dca8d90529}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{d33f6896-138a-4760-91b4-287715ea0c1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{a2576a38-be3a-426a-abd5-c45ec6aa91e8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="CoffaViewer.h">
+      <Filter>Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="View.h">
+      <Filter>Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="Doc.h">
+      <Filter>Headers</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="CoffaViewer.qrc">
+      <Filter>Resources</Filter>
+    </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InteractiveShape.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OcctWindow.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CF_Triangle.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="InteractiveSurface.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
