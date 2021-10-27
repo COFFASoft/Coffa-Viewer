@@ -428,7 +428,7 @@ void View::initViewActions()
     QAction* a;
 
     QIcon icon1;
-    icon1.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/FitALL.png")), QIcon::Normal, QIcon::Off);
+    icon1.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/FitAll.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Fit All\n", this);
     a->setIcon(icon1);
     a->setToolTip(QObject::tr("Fit All"));
@@ -445,7 +445,7 @@ void View::initViewActions()
     myViewActions->insert(ViewFitAreaId, a);*/
 
     QIcon icon2;
-    icon2.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Zoom.png")), QIcon::Normal, QIcon::Off);
+    icon2.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Zoom.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Zoom\n", this);
     a->setIcon(icon2);
     a->setToolTip(QObject::tr("Zoom"));
@@ -456,7 +456,7 @@ void View::initViewActions()
     myViewActions->insert(ViewZoomId, a);
 
     QIcon icon3;
-    icon3.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Pan.png")), QIcon::Normal, QIcon::Off);
+    icon3.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Pan.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Pan\n", this);
     a->setIcon(icon3);
     a->setToolTip(QObject::tr("Pan"));
@@ -467,7 +467,7 @@ void View::initViewActions()
     myViewActions->insert(ViewPanId, a);
 
     QIcon icon4;
-    icon4.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Rotate.png")), QIcon::Normal, QIcon::Off);
+    icon4.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Rotate.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Rotation\n", this);
     a->setIcon(icon4);
     a->setToolTip(QObject::tr("Rotation"));
@@ -486,7 +486,7 @@ void View::initViewActions()
      myViewActions->insert(ViewGlobalPanId, a);*/
 
     QIcon icon5;
-    icon5.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Front.png")), QIcon::Normal, QIcon::Off);
+    icon5.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Front.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Front\n", this);
     a->setIcon(icon5);
     a->setToolTip(QObject::tr("Front View"));
@@ -495,7 +495,7 @@ void View::initViewActions()
     myViewActions->insert(ViewFrontId, a);
 
     QIcon icon6;
-    icon6.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Back.png")), QIcon::Normal, QIcon::Off);
+    icon6.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Back.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Back\n", this);
     a->setIcon(icon6);
     a->setToolTip(QObject::tr("Back View"));
@@ -504,7 +504,7 @@ void View::initViewActions()
     myViewActions->insert(ViewBackId, a);
 
     QIcon icon7;
-    icon7.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Top.png")), QIcon::Normal, QIcon::Off);
+    icon7.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Top.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Top\n", this);
     a->setIcon(icon7);
     a->setToolTip(QObject::tr("Top View"));
@@ -513,7 +513,7 @@ void View::initViewActions()
     myViewActions->insert(ViewTopId, a);
 
     QIcon icon8;
-    icon8.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Bottom.png")), QIcon::Normal, QIcon::Off);
+    icon8.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Bottom.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Bottom\n", this);
     a->setIcon(icon8);
     a->setToolTip(QObject::tr("Bottom View"));
@@ -522,7 +522,7 @@ void View::initViewActions()
     myViewActions->insert(ViewBottomId, a);
 
     QIcon icon9;
-    icon9.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Left.png")), QIcon::Normal, QIcon::Off);
+    icon9.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Left.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Left\n ", this);
     a->setIcon(icon9);
     a->setToolTip(QObject::tr("Left View"));
@@ -531,7 +531,7 @@ void View::initViewActions()
     myViewActions->insert(ViewLeftId, a);
 
     QIcon icon10;
-    icon10.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Right.png")), QIcon::Normal, QIcon::Off);
+    icon10.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Right.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Right\n ", this);
     a->setIcon(icon10);
     a->setToolTip(QObject::tr("Right View"));
@@ -540,7 +540,7 @@ void View::initViewActions()
     myViewActions->insert(ViewRightId, a);
 
     QIcon icon11;
-    icon11.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Axo.png")), QIcon::Normal, QIcon::Off);
+    icon11.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Axo.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Axo\nView", this);
     a->setIcon(icon11);
     a->setToolTip(QObject::tr("Axo View"));
@@ -549,7 +549,7 @@ void View::initViewActions()
     myViewActions->insert(ViewAxoId, a);
 
     QIcon icon12;
-    icon12.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Reset.png")), QIcon::Normal, QIcon::Off);
+    icon12.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Reset.png")), QIcon::Normal, QIcon::Off);
     a = new QAction("Reset\nViews", this);
     a->setIcon(icon12);
     a->setToolTip(QObject::tr("Reset Views"));
@@ -558,7 +558,7 @@ void View::initViewActions()
     myViewActions->insert(ViewResetId, a);
 
     QIcon icon13;
-    icon13.addPixmap(QPixmap(QString::fromUtf8(":/Coffa_Project/Resources/Grid.png")), QIcon::Normal, QIcon::Off);
+    icon13.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Grid.png")), QIcon::Normal, QIcon::Off);
     a = new QAction(QObject::tr("Plate\nOn/Off"), this);
     a->setToolTip(QObject::tr("Plate On/Off"));
     a->setStatusTip(QObject::tr("Plate On/Off"));
@@ -712,18 +712,12 @@ void View::mouseReleaseEvent(QMouseEvent* theEvent)
     {
         //Popup(aPnt.x(), aPnt.y());
 
-       /* if (myCurrentMode == CurAction3d_Nothing)
-        {
-            qDebug() << "Is emitted";
-            PartClicked(Emitter4++);
-        }*/
     }
 
     if (theEvent->button() == Qt::LeftButton)
     {
         if (myCurrentMode == CurAction3d_Nothing)
         {
-            //qDebug() << "Is emitted";
             PartClicked(Emitter4++);
         }
     }

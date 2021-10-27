@@ -1,5 +1,24 @@
 <RCC>
     <qresource prefix="/CoffaViewer">
         <file>Resources/AppCof.png</file>
+        <file>Resources/about.png</file>
+        <file>Resources/export.png</file>
+        <file>Resources/import.png</file>
+        <file>Resources/move.png</file>
+        <file>Resources/orient.png</file>
+        <file>Resources/delete.png</file>
+        <file>Resources/FitAll.png</file>
+        <file>Resources/Zoom.png</file>
+        <file>Resources/Pan.png</file>
+        <file>Resources/Rotate.png</file>
+        <file>Resources/Axo.png</file>
+        <file>Resources/Back.png</file>
+        <file>Resources/Bottom.png</file>
+        <file>Resources/Front.png</file>
+        <file>Resources/Left.png</file>
+        <file>Resources/Right.png</file>
+        <file>Resources/Top.png</file>
+        <file>Resources/Grid.png</file>
+        <file>Resources/Reset.png</file>
     </qresource>
 </RCC>

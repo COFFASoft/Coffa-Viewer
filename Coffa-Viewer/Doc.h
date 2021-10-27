@@ -53,7 +53,7 @@ public:
 
 	void									fitAll();
 	void									AddPart(QString PartName);
-	void									RemovePart(int theShapeID);
+	void									RemovePart();
 	QList<InteractiveShape*>				getListOfShapes();
 	void									displayCAD(InteractiveShape* pShape);
 	void									rotateCurrentShape(int aSequence, double angX, double angY, double angZ);

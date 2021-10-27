@@ -254,7 +254,7 @@ void Doc::AddPart(QString fileName)
 	}
 }
 
-void Doc::RemovePart(int theShapeID)
+void Doc::RemovePart()
 {
 	listOfShapes[Shapeid]->removeAllInteractives();
 	listOfShapes.removeAt(Shapeid);
