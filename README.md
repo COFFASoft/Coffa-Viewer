@@ -2,6 +2,8 @@
 An Open Source 3D Viewer (Part of COFFA Project) based on Opencascade.
 You can clone and customize the CoffaViewer with respect to your context.
 The 3D kernel is based on Opencascade Library and the Front-end is based on Qt.
+![Visual](https://user-images.githubusercontent.com/64405374/138902371-82b68e87-4684-47f0-9d13-a69166f43b2c.png)
+
 
 ## Downloads
 A visual studio project is provided in the repository. You need to download and install sources for OCCT and Qt as indicated below. 
