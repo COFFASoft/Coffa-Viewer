@@ -455,7 +455,7 @@ void Doc::Platform()
 	PAISEdge3 = new AIS_Shape(edge3.Edge());
 	PAISEdge4 = new AIS_Shape(edge4.Edge());
 
-	Handle(Prs3d_LineAspect) LineAspect = new Prs3d_LineAspect(Quantity_NOC_GRAY, Aspect_TOL_SOLID, 1);
+	Handle(Prs3d_LineAspect) LineAspect = new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1);
 	Handle(Prs3d_Drawer) selectionStyle1 = new Prs3d_Drawer();
 	selectionStyle1->SetLineAspect(LineAspect);
 	selectionStyle1->SetWireAspect(LineAspect);
@@ -466,10 +466,6 @@ void Doc::Platform()
 	PAISEdge2->SetAttributes(selectionStyle1);
 	PAISEdge3->SetAttributes(selectionStyle1);
 	PAISEdge4->SetAttributes(selectionStyle1);
-	
-	//getContext()->Deactivate(AIS_Shape::SelectionMode(TopAbs_EDGE));
-	//getContext()->Deactivate(AIS_Shape::SelectionMode(TopAbs_VERTEX));
-	
 	
 	TopoDS_Wire wire = polygon1.Wire();
 	TopoDS_Face Plateface = BRepBuilderAPI_MakeFace(wire);
@@ -483,7 +479,7 @@ void Doc::Platform()
 	selectionStyle->SetWireDraw(true);
 	PlateAIS->SetAttributes(selectionStyle);
 	PlateAIS->SetDisplayMode(AIS_Shaded);
-	PlateAIS->SetTransparency(0.5);
+	PlateAIS->SetTransparency(0.3);
 	PlateAIS->SetColor(Quantity_NOC_GRAY);
 	PlatformIO = PlateAIS;
 	

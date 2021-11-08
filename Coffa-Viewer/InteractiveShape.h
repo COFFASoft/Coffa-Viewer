@@ -66,7 +66,6 @@ public:
 	double currentRz();
 
 	double getTotalArea();
-	void rotateShape2(gp_Quaternion aQuaternion, double angx, double angy, double angz);
 	void rotateShape(gp_Quaternion aQuaternion, double angx, double angy, double angz);
 	void translatePart(double mx, double my, double mz);
 	QList<QList<gp_Pnt>> sliceTriangle(gp_Pnt Pnt1, gp_Pnt Pnt2, gp_Pnt Pnt3, gp_Dir aNormal,
@@ -77,6 +76,9 @@ public:
 
 	bool someIsSelected=false;
 	QList<InteractiveSurface*> theSurfaces;
+
+	double Rx, Ry, Rz;
+	double Tx, Ty, Tz;
 private:
 	TopoDS_Shape theShape;
 	TopoDS_Shape theProcessingShape;
@@ -86,8 +88,7 @@ private:
 	QString theName;
 	QList<InteractiveSurface*> theOriginSurfaces;
 	
-	double Rx, Ry, Rz;
-	double Tx, Ty, Tz;
+	
 
 	bool alreadyComputedArea;
 	double thetotalArea;

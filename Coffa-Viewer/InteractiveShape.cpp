@@ -264,66 +264,6 @@ double InteractiveShape::getTotalArea()
 	return thetotalArea;
 }
 
-void InteractiveShape::rotateShape2(gp_Quaternion aQuaternion, double angx, double angy, double angz)
-{
-	Rx = angx;
-	Ry = angy;
-	Rz = angz;
-
-	//Get Initial Position
-	Bnd_Box B0;
-	BRepBndLib::Add(theShape, B0);
-	double Bxmin0, Bymin0, Bzmin0, Bxmax0, Bymax0, Bzmax0;
-	B0.Get(Bxmin0, Bymin0, Bzmin0, Bxmax0, Bymax0, Bzmax0);
-	double Px0 = ((Bxmax0)+(Bxmin0)) / 2;
-	double Py0 = ((Bymax0)+(Bymin0)) / 2;
-	gp_Pnt initcenter(Px0, Py0, Bzmin0);
-
-	//Transform the shape in background
-	rotQuaternion = aQuaternion;
-	gp_Trsf rotTrsf;
-	rotTrsf.SetRotation(rotQuaternion);
-	BRepBuilderAPI_Transform myPartRotation(theOriginShape, rotTrsf, Standard_False);
-	theShape = myPartRotation.Shape();
-
-
-	//Get Final Position
-	Bnd_Box B;
-	BRepBndLib::Add(theShape, B);
-	double Bxmin, Bymin, Bzmin, Bxmax, Bymax, Bzmax;
-	B.Get(Bxmin, Bymin, Bzmin, Bxmax, Bymax, Bzmax);
-	double Px = ((Bxmax)+(Bxmin)) / 2;
-	double Py = ((Bymax)+(Bymin)) / 2;
-	gp_Pnt Pcenter(Px, Py, Bzmin);
-	//gp_Pnt PrinterCenter(theDoc->PrinterX / 2, theDoc->PrinterY / 2, 0);
-
-	trlVector = gp_Vec(Pcenter, initcenter);
-	gp_Trsf transTrsf;
-	transTrsf.SetTranslation(trlVector);
-	BRepBuilderAPI_Transform myPartTranslation(theShape, transTrsf, Standard_False);
-	theShape = myPartTranslation.Shape();
-
-	//TransformInteractives
-	gp_Trsf myTransform;
-	myTransform.SetTransformation(rotQuaternion, trlVector);
-
-	//Parse Faces of Rotated Shape
-	TopExp_Explorer ExpFace;
-	TopTools_IndexedMapOfShape myIndexMap;
-	TopExp Mapper;
-	Mapper.MapShapes(theShape, TopAbs_FACE, myIndexMap);
-
-	for (int m = 1; m <= myIndexMap.Size(); m++)
-	{
-		if (m - 1 < theSurfaces.size())
-		{
-			theSurfaces[m - 1]->transformTriangles(myTransform);
-			if (theSurfaces[m - 1]->getFace().IsSame(TopoDS::Face(myIndexMap.FindKey(m))));
-			theSurfaces[m - 1]->setFace(TopoDS::Face(myIndexMap.FindKey(m)));
-		}
-	}
-}
-
 void InteractiveShape::rotateShape(gp_Quaternion aQuaternion, double angx, double angy, double angz)
 {
 	Rx = angx;
@@ -381,7 +321,6 @@ void InteractiveShape::rotateShape(gp_Quaternion aQuaternion, double angx, doubl
 			theSurfaces[m - 1]->setFace(TopoDS::Face(myIndexMap.FindKey(m)));
 		}
 	}
-	IObject->SetTransparency(0.0);
 }
 
 void InteractiveShape::translatePart(double mx, double my, double mz)
@@ -424,8 +363,10 @@ void InteractiveShape::translatePart(double mx, double my, double mz)
 	BRepBuilderAPI_Transform myPartTranslation2(theShape, transTrsf, Standard_False);
 	theShape = myPartTranslation2.Shape();
 
+	//To restore the geometry Rotation state
 	rotateShape(rotQuaternion, Rx, Ry, Rz);
 
+	theDoc->getContext()->Update(IObject, true);
 }
 
 QList<QList<gp_Pnt>> InteractiveShape::sliceTriangle(gp_Pnt Pnt1, gp_Pnt Pnt2, gp_Pnt Pnt3, gp_Dir theNormal, gp_Dir SliceDirection, double zMin, double zMax, double space)

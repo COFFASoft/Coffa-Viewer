@@ -19,6 +19,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMdiArea>
 #include <QtWidgets/QDialog>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMenu>
 #include <QtCore/QObject>
@@ -73,6 +74,7 @@ public:
 	void						fitAll();
 
 	void						createRotationDialog();
+	void						createTranslationDialog();
 
 	
 
@@ -85,8 +87,14 @@ public slots:
 	void						onShapeInViewClicked();
 	void						onExecuteSelection();
 
+	void						onActivatethePlate();
+	void						onDeActivatethePlate();
+
 	void						onShowRotDialog();
 	void						onRotate();
+
+	void						onShowTrlDialog();
+	void onTranslate();
 
 	void						onAxisChanged();
 
@@ -94,22 +102,29 @@ protected:
 	virtual void                    resizeEvent(QResizeEvent*);
 
 private:
-	Doc* aDoc;
-	View* myView;
+	Doc* aDoc; //Working Document
+	View* myView; //OCCT 3D Viewer
 	QFrame* mainFrame;
-	QPalette thePalette;
-	QToolBar* mainToolBar, *viewToolBar;
-	bool viewToolsDone=false;
-	QList<QToolButton*> ListofToolBarButton;
-	QList<QCheckBox*> ListofExportCH;
+	QPalette thePalette; //Embeds the theme of the UI
 
-	QDialog* ExportDialog;
+	QWidget* shapeSelectionWidget;
+	QVBoxLayout* shapeSelectionLayout;
+	QScrollArea* shapeSelectionScroller;
+	QList<QCheckBox*> checkBoxList; //For selecting a shape on the left side widget (shapeSelectionWidget)
+
+	QToolBar* mainToolBar, *viewToolBar; //Tool bars
+	bool viewToolsDone=false; //To check whether viewer tools have been built
+	QList<QToolButton*> ListofToolBarButton;
+	
+
+	QDialog* ExportDialog; //Allows selecting a shape to export
+	QList<QCheckBox*> ListofExportCH;
 	QPushButton* goExportButton;
 
-	QMenu* ShapeProp;
+	QMenu* ShapeProp; //Menu of shape that shows up in the viewer
 
-	QDialog* RotDialog, * MoveDialog;
-
+	////Rotation and Translation Dialog Boxes////
+	QDialog* RotDialog, * TrlDialog; 
 	QDial* RxDial, * RyDial, * RzDial;
 	double Rx, Ry, Rz;
 	QDoubleSpinBox* TxSpin, * TySpin, * TzSpin;

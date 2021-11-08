@@ -14,27 +14,46 @@ CoffaViewer::CoffaViewer(QWidget *parent)
 	QVBoxLayout* layout = new QVBoxLayout(mainFrame);
 	layout->setMargin(0);
 	mainFrame->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+	mainFrame->setStyleSheet("QFrame{background-color:rgb(255,255,255);border:0px solid white}");
 	setCentralWidget(mainFrame);
 	onSetPalette();
-	setStyleSheet("QToolTip{background-color: white;border: 1px solid rgba(73, 84, 100,1); border-radius:4px}");
+	setStyleSheet("QToolTip{background-color: white;border: 1px solid rgba(73, 84, 100,1);border-radius:5px}");
 
 
-	//Embedding 3D Viewer
+	//Embedding 3D Viewer & Document
 	aDoc = createNewDocument();
-
 	myView = new View(aDoc->getContext(), mainFrame);
 	layout->addWidget(myView);
 
-	//To detect a shape is clicked
+	//This Widget will show the loaded shapes
+	shapeSelectionWidget = new QWidget();
+	shapeSelectionWidget->move(0, 0);
+	shapeSelectionWidget->setFixedSize(300, 80);
+	shapeSelectionWidget->setObjectName("shapeSelect");
+	shapeSelectionWidget->setStyleSheet("QWidget#shapeSelect{background-color: transparent; margin:5px}");
+
+	//QWidget* aWidget = new QWidget(shapeSelectionWidget); //intermediate widget to encapsulate the scroller 
+	shapeSelectionLayout = new QVBoxLayout;
+	shapeSelectionWidget->setLayout(shapeSelectionLayout);
+	shapeSelectionScroller = new QScrollArea(mainFrame);
+	shapeSelectionScroller->setGeometry(20, 30, 310, 100);
+	shapeSelectionScroller->setAlignment(Qt::AlignRight);
+	shapeSelectionScroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	shapeSelectionScroller->setWidgetResizable(true);
+	shapeSelectionScroller->setStyleSheet("QScrollArea{background-color:rgb(245,245,245)}");//border:1px solid rgb(60, 69, 82)
+	shapeSelectionScroller->setWidget(shapeSelectionWidget);
+	shapeSelectionScroller->hide();
+	//To Detect a Shape is clicked in Viewer
 	connect(myView, SIGNAL(PartClicked(int)), this, SLOT(onShapeInViewClicked()));
 
 	//To Activate or DeActivate Plate in Viewer
-	connect(myView, SIGNAL(GridClick(int)), this, SLOT(ActivatetheGrid()));
-	connect(myView, SIGNAL(GridClick2(int)), this, SLOT(DeActivatetheGrid()));
+	connect(myView, SIGNAL(GridClick(int)), this, SLOT(onActivatethePlate()));
+	connect(myView, SIGNAL(GridClick2(int)), this, SLOT(onDeActivatethePlate()));
 
 	createTools();
 	fitAll();
 	initializeAll();
+	setMinimumSize(500, 500);
 }
 
 void CoffaViewer::onSetPalette()
@@ -75,7 +94,7 @@ void CoffaViewer::resizeEvent(QResizeEvent*)
 {
 	if (viewToolsDone)
 	{
-		double moveX = (mainFrame->width() - 500) / 2;
+		double moveX = (mainFrame->width() - 60);
 		viewToolBar->move(moveX, 30);
 		//viewToolBar->setFixedSize(mainFrame->width(), 30);
 	}
@@ -128,12 +147,13 @@ void CoffaViewer::createTools()
 	MoveButton->setIcon(iconMove);
 	MoveButton->setText("Move\nPart");
 	MoveButton->setToolTip("Move Part");
-	connect(MoveButton, SIGNAL(released()), this, SLOT(onShowMoveDialog()));
+	connect(MoveButton, SIGNAL(released()), this, SLOT(onShowTrlDialog()));
 
 	QSize iconSize;
 	iconSize.setWidth(45);
 	iconSize.setHeight(45);
 	mainToolBar = addToolBar("Tools");
+	mainToolBar->setStyleSheet("QToolBar{background-color:rgb(255,255,255);border:0px solid white}");
 	mainToolBar->setIconSize(iconSize);
 	mainToolBar->addWidget(ImportButton);
 	mainToolBar->addWidget(ExportButton);
@@ -146,8 +166,8 @@ void CoffaViewer::createTools()
 void CoffaViewer::createViewActions()
 {
 	viewToolBar = new QToolBar(mainFrame);
-	viewToolBar->setOrientation(Qt::Horizontal);
-	viewToolBar->setFixedSize(600, 45);
+	viewToolBar->setOrientation(Qt::Vertical);
+	viewToolBar->setFixedSize(45, 600);
 	viewToolBar->setMovable(0);
 	QSize asi;
 	asi.setHeight(35);
@@ -167,6 +187,7 @@ void CoffaViewer::initializeAll()
 {
 	createViewActions();
 	createRotationDialog();
+	createTranslationDialog();
 
 	ShapeProp = new QMenu(this);
 
@@ -190,7 +211,7 @@ void CoffaViewer::initializeAll()
 	QAction* action3 = new QAction("Move", this);
 	action3->setIcon(icont);
 	action3->setToolTip("Move");
-	connect(action3, SIGNAL(triggered()), this, SLOT(onShowTranslateDialog()));
+	connect(action3, SIGNAL(triggered()), this, SLOT(onShowTrlDialog()));
 
 	QIcon iconex;
 	iconex.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/export.png")), QIcon::Normal, QIcon::Off);
@@ -266,6 +287,20 @@ void CoffaViewer::onExecuteSelection()
 	}
 }
 
+//Activates the plate for 3D Printing Reference
+void CoffaViewer::onActivatethePlate()
+{
+	aDoc->PlatformOn();
+	aDoc->PlatformVisible = true;
+}
+
+//Deactivates the plate for 3D Printing Reference
+void CoffaViewer::onDeActivatethePlate()
+{
+	aDoc->PlatformOff();
+	aDoc->PlatformVisible = false;
+}
+
 
 
 ///////////////////////
@@ -278,17 +313,72 @@ void CoffaViewer::onImportPart()
 
 	if (!fileName.isEmpty())
 	{
-		/*theNotifier = new NotificationWidget("Reading Shape Data...");
-		theNotifier->setParent(this);
-		theNotifier->move(this->width() - 370, this->height() - 170);
-		theNotifier->show();*/
 		QApplication::processEvents();
 		aDoc->AddPart(fileName);
+		aDoc->Shapeid = aDoc->getListOfShapes().size() - 1;
+		shapeSelectionScroller->show();
 
-		//itemProject->appendRow(aDoc->getListOfShapes().last()->getTreeItem());
-		//theNotifier->close();
+		//Add it top the shape selection widget on the left side
+		QCheckBox *aCheckBox = new QCheckBox(aDoc->getListOfShapes().last()->getName());
+		shapeSelectionLayout->addWidget(aCheckBox, 0, Qt::AlignLeft);
+
+		int newHeight = 60 + (aDoc->getListOfShapes().size() * 25);
+		shapeSelectionWidget->setFixedHeight(newHeight);
+		if (newHeight < 400)
+			shapeSelectionScroller->setFixedHeight(newHeight + 10);
+	}
+}
+
+//Allows Selection of a part to export
+void CoffaViewer::onExportDialog()
+{
+	ExportDialog = new QDialog(this);
+	ExportDialog->setFixedSize(400, 350);
+	ExportDialog->show();
+
+	QWidget* awid = new QWidget(ExportDialog);
+	awid->move(10, 10);
+	awid->setFixedSize(380, 250);
+	QVBoxLayout* avl = new QVBoxLayout();
+	awid->setLayout(avl);
+	awid->show();
+
+	goExportButton = new QPushButton("Export", ExportDialog);
+	goExportButton->setFixedSize(100, 30);
+	goExportButton->move(250, 300);
+	goExportButton->show();
+	connect(goExportButton, SIGNAL(released()), this, SLOT(onExport()));
+
+	ListofExportCH.clear();
+	if (!aDoc->getListOfShapes().isEmpty())
+	{
+		QButtonGroup* aGC = new QButtonGroup();
+		for (int i = 0; i < aDoc->getListOfShapes().size(); i++)
+		{
+			QCheckBox* aCheck = new QCheckBox(aDoc->getListOfShapes().at(i)->getName());
+			if (aDoc->Shapeid == i)
+			{
+				aCheck->setChecked(1);
+			}
+
+			aGC->addButton(aCheck);
+			ListofExportCH.push_back(aCheck);
+			avl->addWidget(aCheck);
+			aCheck->show();
+		}
 
 	}
+
+	else if (aDoc->getListOfShapes().isEmpty())
+	{
+		QLabel* aLab = new QLabel("Message:\nThere is no Geometry to Export\nPlease use Load Part Button to add", ExportDialog);
+		aLab->move(10, 20);
+		aLab->setFixedSize(380, 60);
+		aLab->setStyleSheet("QLabel {background:#ffcf7f; color: #4b4b4b}");
+		aLab->show();
+		goExportButton->setDisabled(1);
+	}
+
 }
 
 void CoffaViewer::onExport()
@@ -347,57 +437,6 @@ void CoffaViewer::onExport()
 	{
 		QToolTip::showText(goExportButton->mapToGlobal(QPoint(0, 0)), "Please select one part to export");
 	}
-}
-
-void CoffaViewer::onExportDialog()
-{
-	ExportDialog = new QDialog(this);
-	ExportDialog->setFixedSize(400, 350);
-	ExportDialog->show();
-
-	QWidget* awid = new QWidget(ExportDialog);
-	awid->move(10, 10);
-	awid->setFixedSize(380, 250);
-	QVBoxLayout* avl = new QVBoxLayout();
-	awid->setLayout(avl);
-	awid->show();
-
-	goExportButton = new QPushButton("Export", ExportDialog);
-	goExportButton->setFixedSize(100, 30);
-	goExportButton->move(250, 300);
-	goExportButton->show();
-	connect(goExportButton, SIGNAL(released()), this, SLOT(onExport()));
-
-	ListofExportCH.clear();
-	if (!aDoc->getListOfShapes().isEmpty())
-	{
-		QButtonGroup* aGC = new QButtonGroup();
-		for (int i = 0; i < aDoc->getListOfShapes().size(); i++)
-		{
-			QCheckBox* aCheck = new QCheckBox(aDoc->getListOfShapes().at(i)->getName());
-			if (aDoc->Shapeid == i)
-			{
-				aCheck->setChecked(1);
-			}
-
-			aGC->addButton(aCheck);
-			ListofExportCH.push_back(aCheck);
-			avl->addWidget(aCheck);
-			aCheck->show();
-		}
-
-	}
-
-	else if (aDoc->getListOfShapes().isEmpty())
-	{
-		QLabel* aLab = new QLabel("Message:\nThere is no Geometry to Export\nPlease use Load Part Button to add", ExportDialog);
-		aLab->move(10, 20);
-		aLab->setFixedSize(380, 60);
-		aLab->setStyleSheet("QLabel {background:#ffcf7f; color: #4b4b4b}");
-		aLab->show();
-		goExportButton->setDisabled(1);
-	}
-
 }
 
 void CoffaViewer::onRemovePart()
@@ -606,6 +645,71 @@ void CoffaViewer::onRotate()
 		aDoc->rotateCurrentShape(theSequence, RxDial->value(), RyDial->value(), RzDial->value());
 	}
 }
+
+void CoffaViewer::createTranslationDialog()
+{
+	TrlDialog = new QDialog(this);
+	TrlDialog->setWindowTitle("Move");
+	TrlDialog->setFixedSize(300, 170);
+	QFormLayout* TrlForm = new QFormLayout();
+	TrlDialog->setLayout(TrlForm);
+
+	TxSpin = new QDoubleSpinBox();
+	TxSpin->setAlignment(Qt::AlignRight);
+	TxSpin->setMaximum(1000);
+	TxSpin->setMinimum(-1000);
+	TxSpin->setSuffix(".mm");
+	//TxSpin->setStyleSheet("QDoubleSpinBox{ background: #696969 ; color: white}");
+	connect(TxSpin, SIGNAL(valueChanged(double)), SLOT(setValue(int)));
+	TrlForm->addRow(tr("&X Dir:"), TxSpin);
+
+	TySpin = new QDoubleSpinBox();
+	TySpin->setAlignment(Qt::AlignRight);
+	TySpin->setMaximum(1000);
+	TySpin->setMinimum(-1000);
+	TySpin->setSuffix(".mm");
+	//TySpin->setStyleSheet("QDoubleSpinBox{ background: #696969 ; color: white}");
+	connect(TySpin, SIGNAL(valueChanged(double)), SLOT(setValue(int)));
+	TrlForm->addRow(tr("&Y Dir:"), TySpin);
+
+	TzSpin = new QDoubleSpinBox();
+	TzSpin->setAlignment(Qt::AlignRight);
+	TzSpin->setMaximum(1000);
+	TzSpin->setMinimum(0);
+	TzSpin->setSuffix(".mm");
+	//TzSpin->setStyleSheet("QDoubleSpinBox{ background: #696969 ; color: white}");
+	connect(TzSpin, SIGNAL(valueChanged(double)), SLOT(setValue(int)));
+	TrlForm->addRow(tr("&Z Dir:"), TzSpin);
+
+	QPushButton* OkButtonTrl = new QPushButton("Apply", TrlDialog);
+	OkButtonTrl->setFixedSize(60, 30);
+	OkButtonTrl->move(120, 120);
+	OkButtonTrl->setShortcut(QObject::tr("Apply"));
+	connect(OkButtonTrl, SIGNAL(released()), this, SLOT(onTranslate()));
+
+	TrlDialog->hide();
+}
+
+void CoffaViewer::onShowTrlDialog()
+{
+	TrlDialog->show();
+	ShapeProp->hide();
+	if (!aDoc->getListOfShapes().isEmpty() && aDoc->Shapeid < aDoc->getListOfShapes().size())
+	{
+		TxSpin->setValue(aDoc->getListOfShapes()[aDoc->Shapeid]->Tx);
+		TySpin->setValue(aDoc->getListOfShapes()[aDoc->Shapeid]->Ty);
+		TzSpin->setValue(aDoc->getListOfShapes()[aDoc->Shapeid]->Tz);
+	}
+}
+
+void CoffaViewer::onTranslate()
+{
+	if (aDoc->getListOfShapes().size() != 0)
+	{
+		aDoc->getListOfShapes()[aDoc->Shapeid]->translatePart(TxSpin->value(), TySpin->value(), TzSpin->value());
+	}
+}
+
 
 void CoffaViewer::onAxisChanged()
 {
