@@ -61,8 +61,7 @@ public:
 	void									Platform();
 	void									PlatformOn();
 	void									PlatformOff();
-	void									checkPartFitnessTool();
-	void									onCheckFitness();
+	void									onUpdatePlate(double plateX, double plateY, double plateZ);
 
 	CoffaViewer*							getApplication();
 	Handle(AIS_InteractiveContext)			getContext();
@@ -82,10 +81,9 @@ public:
 	bool PlatformVisible;
 	int IOid, Shapeid;
 
-	double PrinterX = 300;
-	double PrinterY = 300;
-	double PrinterZ = 300;
-	double PrinterThreshold;
+	double PlateX = 300;
+	double PlateY = 300;
+	double PlateZ = 300;
 
 private:
 	Handle(V3d_Viewer)             Viewer(const Standard_ExtString theName,

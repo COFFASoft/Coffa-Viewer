@@ -76,10 +76,13 @@ public:
 	void						createRotationDialog();
 	void						createTranslationDialog();
 
+	void createPlateSizeTool();
+
+	
+
 public slots:
 	void						onImportPart();
 	void						onExport();
-	void						onExportDialog();
 	void						onRemovePart();
 
 	void						onShapeInViewClicked();
@@ -98,6 +101,9 @@ public slots:
 
 	void						onShowShapeProps();
 
+	void						onShowPlateSettings();
+	void						onSetPlateSize();
+	
 protected:
 	virtual void                    resizeEvent(QResizeEvent*);
 
@@ -116,17 +122,13 @@ private:
 	bool viewToolsDone=false; //To check whether viewer tools have been built
 	QList<QToolButton*> ListofToolBarButton;
 	
-
-	QDialog* ExportDialog; //Allows selecting a shape to export
-	QList<QCheckBox*> ListofExportCH;
-	QPushButton* goExportButton;
-
 	QMenu* ShapeProp; //Menu of shape that shows up in the viewer
 	QDialog* shapePropsDialog;
-	QLabel* nameLabel;
-	QLabel* areaLabel;
-	QLabel* volumeLabel;
-	QLabel* dimLabel;
+
+	QDialog* plateDialog;
+	double PlateX = 300;
+	double PlateY = 300;
+	double PlateZ = 300;
 
 	////Rotation and Translation Dialog Boxes////
 	QDialog* RotDialog, * TrlDialog; 

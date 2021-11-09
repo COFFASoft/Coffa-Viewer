@@ -25,6 +25,9 @@
     <ClCompile Include="InteractiveSurface.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="NotificationWidget.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers">
@@ -45,6 +48,9 @@
       <Filter>Headers</Filter>
     </QtMoc>
     <QtMoc Include="Doc.h">
+      <Filter>Headers</Filter>
+    </QtMoc>
+    <QtMoc Include="NotificationWidget.h">
       <Filter>Headers</Filter>
     </QtMoc>
   </ItemGroup>

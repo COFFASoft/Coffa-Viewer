@@ -7,6 +7,7 @@
 CoffaViewer::CoffaViewer(QWidget *parent)
     : QMainWindow(parent)
 {
+	setWindowTitle("Coffa-Viewer 1.0.0");
 	QIcon iconApp;
 	iconApp.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/AppCof.png")), QIcon::Normal, QIcon::Off);
 	this->setWindowIcon(iconApp);
@@ -32,7 +33,6 @@ CoffaViewer::CoffaViewer(QWidget *parent)
 	shapeSelectionWidget->setObjectName("shapeSelect");
 	shapeSelectionWidget->setStyleSheet("QWidget#shapeSelect{background-color: transparent; margin:5px}");
 
-	//QWidget* aWidget = new QWidget(shapeSelectionWidget); //intermediate widget to encapsulate the scroller 
 	shapeSelectionLayout = new QVBoxLayout;
 	shapeSelectionWidget->setLayout(shapeSelectionLayout);
 	shapeSelectionScroller = new QScrollArea(mainFrame);
@@ -40,9 +40,10 @@ CoffaViewer::CoffaViewer(QWidget *parent)
 	shapeSelectionScroller->setAlignment(Qt::AlignRight);
 	shapeSelectionScroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	shapeSelectionScroller->setWidgetResizable(true);
-	shapeSelectionScroller->setStyleSheet("QScrollArea{background-color:rgb(245,245,245);border:1px solid rgb(60, 69, 82)}");//border:1px solid rgb(60, 69, 82)
+	shapeSelectionScroller->setStyleSheet("QScrollArea{background-color:rgb(250,250,250); border:1px solid rgb(220, 220, 220)}");//border:1px solid rgb(60, 69, 82)
 	shapeSelectionScroller->setWidget(shapeSelectionWidget);
 	shapeSelectionScroller->hide();
+
 	//To Detect a Shape is clicked in Viewer
 	connect(myView, SIGNAL(PartClicked(int)), this, SLOT(onShapeInViewClicked()));
 
@@ -149,6 +150,15 @@ void CoffaViewer::createTools()
 	MoveButton->setToolTip("Move Part");
 	connect(MoveButton, SIGNAL(released()), this, SLOT(onShowTrlDialog()));
 
+	QIcon iconPlate;
+	iconPlate.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Grid2.png")), QIcon::Normal, QIcon::Off);
+	QToolButton* PlateButton = new QToolButton();
+	PlateButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+	PlateButton->setIcon(iconPlate);
+	PlateButton->setText("Set\Plate");
+	PlateButton->setToolTip("Set plate size");
+	connect(PlateButton, SIGNAL(released()), this, SLOT(onShowPlateSettings()));
+
 	QSize iconSize;
 	iconSize.setWidth(45);
 	iconSize.setHeight(45);
@@ -161,6 +171,8 @@ void CoffaViewer::createTools()
 	mainToolBar->addSeparator();
 	mainToolBar->addWidget(RotButton);
 	mainToolBar->addWidget(MoveButton);
+	mainToolBar->addSeparator();
+	mainToolBar->addWidget(PlateButton);
 }
 
 void CoffaViewer::createViewActions()
@@ -188,7 +200,7 @@ void CoffaViewer::initializeAll()
 	createViewActions();
 	createRotationDialog();
 	createTranslationDialog();
-	//createShapePropsDialog();
+	createPlateSizeTool();
 
 	ShapeProp = new QMenu(this);
 
@@ -239,7 +251,6 @@ void CoffaViewer::initializeAll()
 	toolbarl->addSeparator();
 	toolbarl->addAction(action1);
 	
-
 	QWidgetAction* act = new QWidgetAction(this);
 	act->setDefaultWidget(toolbarl);
 	ShapeProp->addAction(act);
@@ -349,58 +360,6 @@ void CoffaViewer::onImportPart()
 	}
 }
 
-//Allows Selection of a part to export
-void CoffaViewer::onExportDialog()
-{
-	ExportDialog = new QDialog(this);
-	ExportDialog->setFixedSize(400, 350);
-	ExportDialog->show();
-
-	QWidget* awid = new QWidget(ExportDialog);
-	awid->move(10, 10);
-	awid->setFixedSize(380, 250);
-	QVBoxLayout* avl = new QVBoxLayout();
-	awid->setLayout(avl);
-	awid->show();
-
-	goExportButton = new QPushButton("Export", ExportDialog);
-	goExportButton->setFixedSize(100, 30);
-	goExportButton->move(250, 300);
-	goExportButton->show();
-	connect(goExportButton, SIGNAL(released()), this, SLOT(onExport()));
-
-	ListofExportCH.clear();
-	if (!aDoc->getListOfShapes().isEmpty())
-	{
-		QButtonGroup* aGC = new QButtonGroup();
-		for (int i = 0; i < aDoc->getListOfShapes().size(); i++)
-		{
-			QCheckBox* aCheck = new QCheckBox(aDoc->getListOfShapes().at(i)->getName());
-			if (aDoc->Shapeid == i)
-			{
-				aCheck->setChecked(1);
-			}
-
-			aGC->addButton(aCheck);
-			ListofExportCH.push_back(aCheck);
-			avl->addWidget(aCheck);
-			aCheck->show();
-		}
-
-	}
-
-	else if (aDoc->getListOfShapes().isEmpty())
-	{
-		QLabel* aLab = new QLabel("Message:\nThere is no Geometry to Export\nPlease use Load Part Button to add", ExportDialog);
-		aLab->move(10, 20);
-		aLab->setFixedSize(380, 60);
-		aLab->setStyleSheet("QLabel {background:#ffcf7f; color: #4b4b4b}");
-		aLab->show();
-		goExportButton->setDisabled(1);
-	}
-
-}
-
 void CoffaViewer::onExport()
 {
 	const char* aFile;
@@ -408,7 +367,7 @@ void CoffaViewer::onExport()
 
 	int ind = aDoc->Shapeid;
 
-	if (ind != -1 && ind < aDoc->getListOfShapes().size() && !radioButtonList.isEmpty())
+	if (ind > -1 && ind < aDoc->getListOfShapes().size() && !radioButtonList.isEmpty())
 	{
 		QString fileName = QFileDialog::getSaveFileName(this, tr("Export File"), "", tr(" STL (*.stl);; STEP (*.step);;BREP (*.brep)"));
 		QFileInfo myFileInfo(fileName);
@@ -442,7 +401,8 @@ void CoffaViewer::onExport()
 
 	else
 	{
-		QToolTip::showText(goExportButton->mapToGlobal(QPoint(0, 0)), "Please select one part to export");
+		QMessageBox::warning(this, QObject::tr("Error!"), "Please select a shape to export",
+			QObject::tr("OK"), QString::null, QString::null, 0, 0);
 	}
 }
 
@@ -452,7 +412,7 @@ void CoffaViewer::onRemovePart()
 
 	int ind = aDoc->Shapeid;
 
-	if (ind != -1 && ind < aDoc->getListOfShapes().size() && !radioButtonList.isEmpty())
+	if (ind > -1 && ind < aDoc->getListOfShapes().size() && !radioButtonList.isEmpty())
 	{
 		shapeSelectionLayout->removeWidget(radioButtonList[ind]);
 		delete radioButtonList[ind];
@@ -492,66 +452,7 @@ void CoffaViewer::createRotationDialog()
 	RotDialog = new QDialog(this);
 	RotDialog->setParent(this);
 	RotDialog->setWindowTitle("Rotate");
-	RotDialog->setFixedSize(400, 400);
-	
-	/*QGroupBox* firtsAxWidgets = new QGroupBox(RotDialog);
-	firtsAxWidgets->setTitle("First Axis");
-	firtsAxWidgets->move(10, 10);
-	firtsAxWidgets->setFixedSize(380, 80);
-	QHBoxLayout* firstAxLayout = new QHBoxLayout;
-	firtsAxWidgets->setLayout(firstAxLayout);
-
-	QGroupBox* secAxWidgets = new QGroupBox(RotDialog);
-	secAxWidgets->setTitle("Second Axis");
-	secAxWidgets->move(10, 100);
-	secAxWidgets->setFixedSize(380, 80);
-	QHBoxLayout* secAxLayout = new QHBoxLayout;
-	secAxWidgets->setLayout(secAxLayout);
-
-	QRadioButton* xax1 = new QRadioButton("X");
-	xax1->setChecked(1);
-	connect(xax1, &QRadioButton::clicked, [=]() {
-		theAxis1 = 1;
-		onAxisChanged();
-	});
-	firstAxLayout->addWidget(xax1);
-
-	QRadioButton* yax1 = new QRadioButton("Y");
-	connect(yax1, &QRadioButton::clicked, [=]() {
-		theAxis1 = 2;
-		onAxisChanged();
-	});
-	firstAxLayout->addWidget(yax1);
-
-	QRadioButton *zax1 = new QRadioButton("Z");
-	connect(zax1, &QRadioButton::clicked, [=]() {
-		theAxis1 = 3;
-		onAxisChanged();
-	});
-	firstAxLayout->addWidget(zax1);
-
-	QRadioButton* xax2 = new QRadioButton("X");
-	connect(xax2, &QRadioButton::clicked, [=]() {
-		theAxis2 = 1;
-		onAxisChanged();
-	});
-	secAxLayout->addWidget(xax2);
-
-	QRadioButton* yax2 = new QRadioButton("Y");
-	yax2->setChecked(1);
-	connect(yax2, &QRadioButton::toggled, [=]() {
-		theAxis2 = 2;
-		onAxisChanged();
-	});
-	secAxLayout->addWidget(yax2);
-
-	QRadioButton* zax2 = new QRadioButton("Z");
-	connect(zax2, &QRadioButton::clicked, [=]() {
-		theAxis2 = 3;
-		onAxisChanged();
-	});
-	secAxLayout->addWidget(zax2);*/
-
+	RotDialog->setFixedSize(400, 170);
 
 	QGroupBox* RotationCtrlWid = new QGroupBox(RotDialog);
 	RotationCtrlWid->setTitle("Rotation Control");
@@ -623,7 +524,6 @@ void CoffaViewer::createRotationDialog()
 	connect(RyDial, SIGNAL(sliderReleased()), this, SLOT(onRotate()));
 	rotCtrlLayout->addWidget(widY, Qt::AlignCenter);
 
-
 	QWidget* widZ = new QWidget;
 	widZ->setFixedSize(100, 100);
 	QVBoxLayout* vlayZ = new QVBoxLayout;
@@ -655,6 +555,63 @@ void CoffaViewer::createRotationDialog()
 	});
 	connect(RzDial, SIGNAL(sliderReleased()), this, SLOT(onRotate()));
 	rotCtrlLayout->addWidget(widZ, Qt::AlignCenter);
+
+
+	/*QGroupBox* sequenceSelection = new QGroupBox(RotDialog);
+	sequenceSelection->setTitle("Rotation Sequence");
+	sequenceSelection->move(10, 10);
+	sequenceSelection->setFixedSize(380, 80);
+	QGridLayout* sequenceLayout = new QGridLayout;
+	sequenceSelection->setLayout(sequenceLayout);
+
+	QRadioButton *radio1 = new QRadioButton("XYZ");
+	connect(radio1, &QRadioButton::clicked, [=]() {
+		theAxis1 = 1;
+		theAxis2 = 2;
+		onAxisChanged();
+	});
+
+	QRadioButton* radio2 = new QRadioButton("XZY");
+	connect(radio2, &QRadioButton::clicked, [=]() {
+		theAxis1 = 1;
+		theAxis2 = 3;
+		onAxisChanged();
+	});
+
+	QRadioButton* radio3 = new QRadioButton("YXZ");
+	connect(radio3, &QRadioButton::clicked, [=]() {
+		theAxis1 = 2;
+		theAxis2 = 1;
+		onAxisChanged();
+	});
+
+	QRadioButton* radio4 = new QRadioButton("YZX");
+	connect(radio4, &QRadioButton::clicked, [=]() {
+		theAxis1 = 2;
+		theAxis2 = 3;
+		onAxisChanged();
+	});
+
+	QRadioButton* radio5 = new QRadioButton("ZXY");
+	connect(radio5, &QRadioButton::clicked, [=]() {
+		theAxis1 = 3;
+		theAxis2 = 1;
+		onAxisChanged();
+	});
+
+	QRadioButton* radio6 = new QRadioButton("XYZ");
+	connect(radio6, &QRadioButton::clicked, [=]() {
+		theAxis1 = 3;
+		theAxis2 = 2;
+		onAxisChanged();
+	});
+
+	sequenceLayout->addWidget(radio1, 0, 0, Qt::AlignLeft);
+	sequenceLayout->addWidget(radio2, 0, 1, Qt::AlignLeft);
+	sequenceLayout->addWidget(radio3, 1, 0, Qt::AlignLeft);
+	sequenceLayout->addWidget(radio4, 1, 1, Qt::AlignLeft);
+	sequenceLayout->addWidget(radio5, 2, 1, Qt::AlignLeft);
+	sequenceLayout->addWidget(radio6, 2, 1, Qt::AlignLeft);*/
 
 	RotDialog->hide();
 
@@ -804,7 +761,7 @@ void CoffaViewer::onAxisChanged()
 void CoffaViewer::onShowShapeProps()
 {
 	shapePropsDialog = new QDialog(this);
-	shapePropsDialog->setFixedSize(400, 250);
+	shapePropsDialog->setFixedSize(400, 260);
 
 	QStringList Vheaders;
 	Vheaders.append("Name");
@@ -856,4 +813,62 @@ void CoffaViewer::onShowShapeProps()
 	myTab->setRowHeight(5, 35);
 
 	shapePropsDialog->show();
+}
+
+
+////////////////////////
+///Plate Tools///
+////////////////////////
+void CoffaViewer::createPlateSizeTool()
+{
+	plateDialog = new QDialog(this);
+	plateDialog->setFixedSize(400, 200);
+
+	QFormLayout* plateLayout = new QFormLayout;
+	plateDialog->setLayout(plateLayout);
+
+	QDoubleSpinBox* xspin = new QDoubleSpinBox;
+	xspin->setRange(0, 10000);
+	xspin->setValue(PlateX);
+	xspin->setSuffix("mm");
+	connect(xspin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double value) {
+		PlateX = xspin->value();
+	});
+
+	QDoubleSpinBox* yspin = new QDoubleSpinBox;
+	yspin->setRange(0, 10000);
+	yspin->setValue(PlateY);
+	yspin->setSuffix("mm");
+	connect(yspin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double value) {
+		PlateY = yspin->value();
+	});
+
+	QDoubleSpinBox* zspin = new QDoubleSpinBox;
+	zspin->setRange(0, 10000);
+	zspin->setValue(PlateZ);
+	zspin->setSuffix("mm");
+	connect(zspin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double value) {
+		PlateZ = zspin->value();
+	});
+
+	QPushButton* okButton = new QPushButton("Update Plate");
+	okButton->setFixedSize(150, 30);
+	QObject::connect(okButton, SIGNAL(released()), this, SLOT(onSetPlateSize()));
+
+	plateLayout->addRow("Width (X)", xspin);
+	plateLayout->addRow("Depth (Y)", yspin);
+	plateLayout->addRow("Height (Z)", zspin);
+	plateLayout->addRow("", okButton);
+
+	plateDialog->hide();
+}
+
+void CoffaViewer::onShowPlateSettings()
+{
+	plateDialog->show();
+}
+
+void CoffaViewer::onSetPlateSize()
+{
+	aDoc->onUpdatePlate(PlateX, PlateY, PlateZ);
 }

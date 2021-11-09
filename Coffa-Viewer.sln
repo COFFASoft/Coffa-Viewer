@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Coffa-Viewer", "Coffa-Viewer\Coffa-Viewer.vcxproj", "{82D61601-2F43-4B04-BBB6-F89DD4D41EE8}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Coffa_Viewer_Setup", "Coffa_Viewer_Setup\Coffa_Viewer_Setup.vdproj", "{F9BDEE81-A3B2-4078-986F-02A2C011BDFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,8 @@ Global
 		{82D61601-2F43-4B04-BBB6-F89DD4D41EE8}.Debug|x64.Build.0 = Debug|x64
 		{82D61601-2F43-4B04-BBB6-F89DD4D41EE8}.Release|x64.ActiveCfg = Release|x64
 		{82D61601-2F43-4B04-BBB6-F89DD4D41EE8}.Release|x64.Build.0 = Release|x64
+		{F9BDEE81-A3B2-4078-986F-02A2C011BDFF}.Debug|x64.ActiveCfg = Debug
+		{F9BDEE81-A3B2-4078-986F-02A2C011BDFF}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

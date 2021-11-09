@@ -78,11 +78,7 @@ Doc::Doc(CoffaViewer* app)
 	: QObject(),
 	myApp(app),
 	IOid(0),
-	PlatformVisible(0),
-	PrinterX(200),
-	PrinterY(200),
-	PrinterZ(180),
-	PrinterThreshold(0)
+	PlatformVisible(0)
 {
 	//setPriority(QThread::NormalPriority);
 	Aspect_GridType aGridtype = Aspect_GT_Rectangular;
@@ -168,7 +164,7 @@ void Doc::AddPart(QString fileName)
 
 		gp_Pnt Pcenter(Px, Py, Bzmin);
 		gp_Trsf myTransform;
-		myTransform.SetTranslation(Pcenter, gp_Pnt(PrinterX / 2, PrinterY / 2, 0));
+		myTransform.SetTranslation(Pcenter, gp_Pnt(PlateX / 2, PlateY / 2, 0));
 		BRepBuilderAPI_Transform myPartCentered(aShape, myTransform, Standard_False);
 		aShape = myPartCentered.Shape();
 
@@ -197,7 +193,7 @@ void Doc::AddPart(QString fileName)
 
 		gp_Pnt Pcenter(Px, Py, Bzmin);
 		gp_Trsf myTransform;
-		myTransform.SetTranslation(Pcenter, gp_Pnt(PrinterX / 2, PrinterY / 2, 0));
+		myTransform.SetTranslation(Pcenter, gp_Pnt(PlateX / 2, PlateY / 2, 0));
 		BRepBuilderAPI_Transform myPartCentered(aShape, myTransform, Standard_False);
 		aShape = myPartCentered.Shape();
 
@@ -231,7 +227,7 @@ void Doc::AddPart(QString fileName)
 
 		gp_Pnt Pcenter(Px, Py, Bzmin);
 		gp_Trsf myTransform;
-		myTransform.SetTranslation(Pcenter, gp_Pnt(PrinterX / 2, PrinterY / 2, 0));
+		myTransform.SetTranslation(Pcenter, gp_Pnt(PlateX / 2, PlateY / 2, 0));
 		BRepBuilderAPI_Transform myPartCentered(aShape, myTransform, Standard_False);
 		aShape = myPartCentered.Shape();
 
@@ -421,13 +417,13 @@ void Doc::Platform()
 {	
 	//the Bounding Box of Printer
 	gp_Pnt P1(0, 0, 0);
-	gp_Pnt P2(PrinterX, 0, 0);
-	gp_Pnt P3(0, PrinterY, 0);
-	gp_Pnt P4(PrinterX, PrinterY, 0);
-	gp_Pnt P5(0, 0, PrinterZ);
-	gp_Pnt P6(PrinterX, 0, PrinterZ);
-	gp_Pnt P7(0, PrinterY, PrinterZ);
-	gp_Pnt P8(PrinterX, PrinterY, PrinterZ);
+	gp_Pnt P2(PlateX, 0, 0);
+	gp_Pnt P3(0, PlateY, 0);
+	gp_Pnt P4(PlateX, PlateY, 0);
+	gp_Pnt P5(0, 0, PlateZ);
+	gp_Pnt P6(PlateX, 0, PlateZ);
+	gp_Pnt P7(0, PlateY, PlateZ);
+	gp_Pnt P8(PlateX, PlateY, PlateZ);
 
 	BRepBuilderAPI_MakePolygon polygon1, polygon2;
 
@@ -577,138 +573,12 @@ void Doc::PlatformOff()
 	//PlatformVisible = false;
 }
 
-void Doc::checkPartFitnessTool()
+void Doc::onUpdatePlate(double plateX, double plateY, double plateZ)
 {
-	fitnessDialog = new QDialog(myApp);
-	fitnessDialog->setFixedSize(500, 300);
-
-	fitnessLayout = new QFormLayout;
-	fitnessDialog->setLayout(fitnessLayout);
-
-	QDoubleSpinBox* xspin = new QDoubleSpinBox;
-	xspin->setRange(-10000, 10000);
-	xspin->setValue(PrinterX);
-	xspin->setSuffix("mm");
-	connect(xspin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double value) {
-		PrinterX = xspin->value();
-		/*PlatformOff();
-		Platform();*/
-	});
-
-	QDoubleSpinBox* yspin = new QDoubleSpinBox;
-	yspin->setRange(-10000, 10000);
-	yspin->setValue(PrinterY);
-	yspin->setSuffix("mm");
-	connect(yspin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double value) {
-		PrinterY = yspin->value();
-		/*PlatformOff();
-		Platform();*/
-	});
-
-	QDoubleSpinBox* zspin = new QDoubleSpinBox;
-	zspin->setRange(-10000, 10000);
-	zspin->setValue(PrinterZ);
-	zspin->setSuffix("mm");
-	connect(zspin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double value) {
-		PrinterZ = zspin->value();
-		/*PlatformOff();
-		Platform();*/
-	});
-
-	QDoubleSpinBox* threspin = new QDoubleSpinBox;
-	threspin->setRange(-10000, 10000);
-	threspin->setValue(PrinterThreshold);
-	threspin->setSuffix("mm");
-	connect(threspin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double value) {
-		PrinterThreshold = threspin->value();
-	});
-
-	PrinterX = xspin->value();
-	PrinterY = yspin->value();
-	PrinterZ = zspin->value();
-	PrinterThreshold = 15;
-	
-	QPushButton* okButton = new QPushButton("Check Fitness");
-	okButton->setFixedSize(150, 30);
-	QObject::connect(okButton, SIGNAL(released()), this, SLOT(onCheckFitness()));
-
-	fitnessLayout->addRow("Width (X)", xspin);
-	fitnessLayout->addRow("Depth (Y)", yspin);
-	fitnessLayout->addRow("Height (Z)", zspin);
-	fitnessLayout->addRow("Theshold", threspin);
-	fitnessLayout->addRow("", okButton);
-
-	dimLabel = new QLabel();
-	dimLabel->setFixedWidth(400);
-
-	msgLabelX = new QLabel();
-	msgLabelX->setFixedWidth(400);
-
-	msgLabelY = new QLabel();
-	msgLabelY->setFixedWidth(400);
-
-	msgLabelZ = new QLabel();
-	msgLabelZ->setFixedWidth(400);
-
-	fitnessLayout->addWidget(dimLabel);
-	fitnessLayout->addWidget(msgLabelX);
-	fitnessLayout->addWidget(msgLabelY);
-	fitnessLayout->addWidget(msgLabelZ);
-
-	fitnessDialog->show();
-}
-
-void Doc::onCheckFitness()
-{
+	PlateX = plateX;
+	PlateY = plateY;
+	PlateZ = plateZ;
 	PlatformOff();
 	Platform();
 	PlatformOn();
-	Bnd_Box B;
-
-	double Bxmin = 0, Bymin = 0, Bzmin = 0, Bxmax = 0, Bymax = 0, Bzmax = 0;
-
-	if (listOfShapes.size() != 0)
-	{
-		BRepBndLib::Add(listOfShapes.at(Shapeid)->getShape(), B);
-		B.Get(Bxmin, Bymin, Bzmin, Bxmax, Bymax, Bzmax);
-
-
-		double dimX = Bxmax - Bxmin;
-		double dimY = Bymax - Bymin;
-		double dimZ = Bzmax - Bzmin;
-
-		dimLabel->setText("Dimensions: X = " + QString::number(dimX) + "   Y = " + QString::number(dimY) + "   Z = " + QString::number(dimZ));
-
-		if (dimX > PrinterX - (2 * PrinterThreshold))
-		{
-			msgLabelX->setText("Too Big along X");
-		}
-
-		else
-		{
-			msgLabelX->setText("Ok along X");
-		}
-
-		if (dimY > PrinterY - (2 * PrinterThreshold))
-		{
-			msgLabelY->setText("Too Big along Y");
-		}
-
-		else
-		{
-			msgLabelY->setText("Ok along Y");
-		}
-
-		if (dimZ > PrinterZ - (PrinterThreshold))
-		{
-			msgLabelZ->setText("Too Big along Z");
-		}
-
-		else
-		{
-			msgLabelZ->setText("Ok along Z");
-		}
-
-	}
-
 }
