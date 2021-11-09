@@ -65,16 +65,6 @@ InteractiveShape::InteractiveShape(TopoDS_Shape aShape, Doc* aDoc)
 	IObject = AISPart;
 
 	theOriginSurfaces = theSurfaces;
-	mainItem = new QStandardItem(theName);
-	QIcon iconPart;
-	iconPart.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/Part.png")), QIcon::Normal, QIcon::Off);
-	mainItem->setIcon(iconPart);
-	mainItem->setEditable(false);
-
-	geomItem = new QStandardItem("Geometry");
-	geomItem->setEditable(false);
-
-	mainItem->appendRow(geomItem);
 }
 
 void InteractiveShape::parseFaces()
@@ -93,10 +83,6 @@ void InteractiveShape::parseFaces()
 		aSurf->setID(QString::number(m));
 		aSurf->Triangulate();
         theSurfaces.push_back(aSurf);
-
-		QStandardItem *surfItem = new QStandardItem(aSurf->getName());
-		surfItem->setEditable(false);
-		geomItem->appendRow(surfItem);
 	}
 
 }
@@ -205,17 +191,11 @@ QString InteractiveShape::getID()
 void InteractiveShape::setName(QString aName)
 {
 	theName = aName;
-	mainItem->setText(theName);
 }
 
 QString InteractiveShape::getName()
 {
 	return theName;
-}
-
-QStandardItem* InteractiveShape::getTreeItem()
-{
-	return mainItem;
 }
 
 Handle(AIS_InteractiveObject) InteractiveShape::getInteractiveObject()
@@ -247,6 +227,19 @@ double InteractiveShape::currentRz()
 ///////  Useful Algorithms  //////////
 /////////////////////////////////////
 
+gp_Pnt InteractiveShape::getCenter()
+{
+	Bnd_Box B0;
+	BRepBndLib::Add(theShape, B0);
+	double Bxmin0, Bymin0, Bzmin0, Bxmax0, Bymax0, Bzmax0;
+	B0.Get(Bxmin0, Bymin0, Bzmin0, Bxmax0, Bymax0, Bzmax0);
+	double Px0 = (Bxmax0+Bxmin0) / 2;
+	double Py0 = (Bymax0+Bymin0) / 2;
+	double Pz0 = (Bzmax0+Bzmin0) / 2;
+
+	return gp_Pnt(Px0, Py0, Pz0);
+}
+
 double InteractiveShape::getTotalArea()
 {
 	if (!alreadyComputedArea)
@@ -262,6 +255,59 @@ double InteractiveShape::getTotalArea()
 
 
 	return thetotalArea;
+}
+
+double InteractiveShape::getVolume()
+{
+	if (!alreadyComputedVolume)
+	{
+		theVolume = 0;
+		GProp_GProps props;
+
+		BRepGProp::VolumeProperties(theOriginShape, props);
+
+		theVolume= props.Mass();
+
+		alreadyComputedVolume = true;
+	}
+
+	return theVolume;
+	
+}
+
+double InteractiveShape::getFaceCount()
+{
+	return theSurfaces.size();
+}
+
+double InteractiveShape::getXDim()
+{
+	Bnd_Box B0;
+	BRepBndLib::Add(theShape, B0);
+	double Bxmin0, Bymin0, Bzmin0, Bxmax0, Bymax0, Bzmax0;
+	B0.Get(Bxmin0, Bymin0, Bzmin0, Bxmax0, Bymax0, Bzmax0);
+
+	return abs(Bxmax0-Bxmin0);
+}
+
+double InteractiveShape::getYDim()
+{
+	Bnd_Box B0;
+	BRepBndLib::Add(theShape, B0);
+	double Bxmin0, Bymin0, Bzmin0, Bxmax0, Bymax0, Bzmax0;
+	B0.Get(Bxmin0, Bymin0, Bzmin0, Bxmax0, Bymax0, Bzmax0);
+
+	return abs(Bymax0-Bymin0);
+}
+
+double InteractiveShape::getZDim()
+{
+	Bnd_Box B0;
+	BRepBndLib::Add(theShape, B0);
+	double Bxmin0, Bymin0, Bzmin0, Bxmax0, Bymax0, Bzmax0;
+	B0.Get(Bxmin0, Bymin0, Bzmin0, Bxmax0, Bymax0, Bzmax0);
+
+	return abs(Bzmax0-Bzmin0);
 }
 
 void InteractiveShape::rotateShape(gp_Quaternion aQuaternion, double angx, double angy, double angz)

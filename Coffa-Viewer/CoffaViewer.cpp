@@ -10,6 +10,7 @@ CoffaViewer::CoffaViewer(QWidget *parent)
 	QIcon iconApp;
 	iconApp.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/AppCof.png")), QIcon::Normal, QIcon::Off);
 	this->setWindowIcon(iconApp);
+	setMinimumSize(600, 500);
 	mainFrame = new QFrame(this);
 	QVBoxLayout* layout = new QVBoxLayout(mainFrame);
 	layout->setMargin(0);
@@ -18,7 +19,6 @@ CoffaViewer::CoffaViewer(QWidget *parent)
 	setCentralWidget(mainFrame);
 	onSetPalette();
 	setStyleSheet("QToolTip{background-color: white;border: 1px solid rgba(73, 84, 100,1);border-radius:5px}");
-
 
 	//Embedding 3D Viewer & Document
 	aDoc = createNewDocument();
@@ -40,7 +40,7 @@ CoffaViewer::CoffaViewer(QWidget *parent)
 	shapeSelectionScroller->setAlignment(Qt::AlignRight);
 	shapeSelectionScroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	shapeSelectionScroller->setWidgetResizable(true);
-	shapeSelectionScroller->setStyleSheet("QScrollArea{background-color:rgb(245,245,245)}");//border:1px solid rgb(60, 69, 82)
+	shapeSelectionScroller->setStyleSheet("QScrollArea{background-color:rgb(245,245,245);border:1px solid rgb(60, 69, 82)}");//border:1px solid rgb(60, 69, 82)
 	shapeSelectionScroller->setWidget(shapeSelectionWidget);
 	shapeSelectionScroller->hide();
 	//To Detect a Shape is clicked in Viewer
@@ -119,7 +119,7 @@ void CoffaViewer::createTools()
 	ExportButton->setIcon(iconExport);
 	ExportButton->setText("Export\nPart");
 	ExportButton->setToolTip("Export the processed part");
-	connect(ExportButton, SIGNAL(released()), this, SLOT(onExportDialog()));
+	connect(ExportButton, SIGNAL(released()), this, SLOT(onExport()));
 	ListofToolBarButton.push_back(ExportButton);
 
 	QIcon iconAbout;
@@ -188,6 +188,7 @@ void CoffaViewer::initializeAll()
 	createViewActions();
 	createRotationDialog();
 	createTranslationDialog();
+	//createShapePropsDialog();
 
 	ShapeProp = new QMenu(this);
 
@@ -218,15 +219,26 @@ void CoffaViewer::initializeAll()
 	QAction* actionexp = new QAction("Export", this);
 	actionexp->setIcon(iconex);
 	actionexp->setToolTip("Export");
-	connect(actionexp, SIGNAL(triggered()), this, SLOT(onExportDialog()));
+	connect(actionexp, SIGNAL(triggered()), this, SLOT(onExport()));
+
+	QIcon iconinfo;
+	iconinfo.addPixmap(QPixmap(QString::fromUtf8(":/CoffaViewer/Resources/shapeInfo.png")), QIcon::Normal, QIcon::Off);
+	QAction* actionInfo = new QAction("Properties", this);
+	actionInfo->setIcon(iconinfo);
+	actionInfo->setToolTip("Shape Properties");
+	connect(actionInfo, SIGNAL(triggered()), this, SLOT(onShowShapeProps()));
 
 	QToolBar* toolbarl = new QToolBar;
-	toolbarl->addAction(action1);
-	toolbarl->addSeparator();
+	
 	toolbarl->addAction(action2);
 	toolbarl->addAction(action3);
 	toolbarl->addSeparator();
+	toolbarl->addAction(actionInfo);
+	toolbarl->addSeparator();
 	toolbarl->addAction(actionexp);
+	toolbarl->addSeparator();
+	toolbarl->addAction(action1);
+	
 
 	QWidgetAction* act = new QWidgetAction(this);
 	act->setDefaultWidget(toolbarl);
@@ -273,6 +285,12 @@ void CoffaViewer::onExecuteSelection()
 		if (aDoc->getListOfShapes()[i]->isSelected())
 		{
 			aDoc->Shapeid = i;
+
+			if (!radioButtonList.isEmpty())
+			{
+				radioButtonList[i]->setChecked(true);
+			}
+
 			b = true;
 			break;
 		}
@@ -319,12 +337,14 @@ void CoffaViewer::onImportPart()
 		shapeSelectionScroller->show();
 
 		//Add it top the shape selection widget on the left side
-		QCheckBox *aCheckBox = new QCheckBox(aDoc->getListOfShapes().last()->getName());
-		shapeSelectionLayout->addWidget(aCheckBox, 0, Qt::AlignLeft);
+		QRadioButton *aButton = new QRadioButton(aDoc->getListOfShapes().last()->getName());
+		shapeSelectionLayout->addWidget(aButton, 0, Qt::AlignLeft);
+		radioButtonList.push_back(aButton);
+		aButton->setChecked(1);
 
-		int newHeight = 60 + (aDoc->getListOfShapes().size() * 25);
+		int newHeight = 60 + (aDoc->getListOfShapes().size() * 30);
 		shapeSelectionWidget->setFixedHeight(newHeight);
-		if (newHeight < 400)
+		if (newHeight < 450)
 			shapeSelectionScroller->setFixedHeight(newHeight + 10);
 	}
 }
@@ -383,18 +403,12 @@ void CoffaViewer::onExportDialog()
 
 void CoffaViewer::onExport()
 {
-	const char* aFile3;
-	bool eq = false;
-	for (int i = 0; i < ListofExportCH.size(); i++)
-	{
-		if (ListofExportCH[i]->isChecked())
-		{
-			eq = true;
-		}
-	}
+	const char* aFile;
+	ShapeProp->hide();
 
+	int ind = aDoc->Shapeid;
 
-	if (eq == true)
+	if (ind != -1 && ind < aDoc->getListOfShapes().size() && !radioButtonList.isEmpty())
 	{
 		QString fileName = QFileDialog::getSaveFileName(this, tr("Export File"), "", tr(" STL (*.stl);; STEP (*.step);;BREP (*.brep)"));
 		QFileInfo myFileInfo(fileName);
@@ -403,33 +417,26 @@ void CoffaViewer::onExport()
 
 		if (!fileName.isNull())
 		{
-			for (int i = 0; i < ListofExportCH.size(); i++)
+			if (aSuffix == "stl")
 			{
-				if (ListofExportCH[i]->isChecked())
-				{
-					if (aSuffix == "stl")
-					{
-						QByteArray ba = fileName.toLatin1();
-						aFile3 = ba.data();
-						aDoc->ExportFileSTL(aFile3, i);
-					}
-
-					else if (aSuffix == "step")
-					{
-						QByteArray ba = fileName.toLatin1();
-						aFile3 = ba.data();
-						aDoc->ExportFileSTEP(aFile3, i);
-					}
-
-					else if (aSuffix == "brep")
-					{
-						QByteArray ba = fileName.toLatin1();
-						aFile3 = ba.data();
-						aDoc->ExportFileBRep(aFile3, i);
-					}
-				}
+				QByteArray ba = fileName.toLatin1();
+				aFile = ba.data();
+				aDoc->ExportFileSTL(aFile, ind);
 			}
-			ExportDialog->close();
+
+			else if (aSuffix == "step")
+			{
+				QByteArray ba = fileName.toLatin1();
+				aFile = ba.data();
+				aDoc->ExportFileSTEP(aFile, ind);
+			}
+
+			else if (aSuffix == "brep")
+			{
+				QByteArray ba = fileName.toLatin1();
+				aFile = ba.data();
+				aDoc->ExportFileBRep(aFile, ind);
+			}
 		}
 	}
 
@@ -441,6 +448,33 @@ void CoffaViewer::onExport()
 
 void CoffaViewer::onRemovePart()
 {
+	ShapeProp->hide();
+
+	int ind = aDoc->Shapeid;
+
+	if (ind != -1 && ind < aDoc->getListOfShapes().size() && !radioButtonList.isEmpty())
+	{
+		shapeSelectionLayout->removeWidget(radioButtonList[ind]);
+		delete radioButtonList[ind];
+		radioButtonList.removeAt(ind);
+		
+		int newHeight = 60 + ((aDoc->getListOfShapes().size()-1) * 30);
+		shapeSelectionWidget->setFixedHeight(newHeight);
+		if (newHeight < 450)
+			shapeSelectionScroller->setFixedHeight(newHeight + 10);
+
+	}
+
+	if (!radioButtonList.isEmpty())
+	{
+		radioButtonList[0]->setChecked(true);
+	}
+
+	else
+	{
+		shapeSelectionScroller->hide();
+	}
+
 	aDoc->RemovePart();
 }
 
@@ -710,7 +744,6 @@ void CoffaViewer::onTranslate()
 	}
 }
 
-
 void CoffaViewer::onAxisChanged()
 {
 	//The rotation Axes must not be the same
@@ -765,3 +798,62 @@ void CoffaViewer::onAxisChanged()
 }
 
 
+////////////////////////
+///Access Shape Props///
+////////////////////////
+void CoffaViewer::onShowShapeProps()
+{
+	shapePropsDialog = new QDialog(this);
+	shapePropsDialog->setFixedSize(400, 250);
+
+	QStringList Vheaders;
+	Vheaders.append("Name");
+	Vheaders.append("Center");
+	Vheaders.append("Area");
+	Vheaders.append("Volume");
+	Vheaders.append("Dimensions");
+	Vheaders.append("Face Count");
+	QTableWidget* myTab = new QTableWidget(shapePropsDialog);
+	myTab->move(10, 10);
+	myTab->setRowCount(6);
+	myTab->setColumnCount(1);
+	myTab->setColumnWidth(0, 290);
+	myTab->setVerticalHeaderLabels(Vheaders);
+	myTab->setFixedWidth(380);
+	myTab->setFixedHeight(35*6 + 25);
+	myTab->setShowGrid(true);
+
+	QTableWidgetItem* item1 = new QTableWidgetItem(aDoc->getListOfShapes().at(aDoc->Shapeid)->getName());
+	myTab->setItem(0, 0, item1);
+	myTab->setRowHeight(0, 35);
+
+	gp_Pnt p = aDoc->getListOfShapes().at(aDoc->Shapeid)->getCenter();
+
+	QTableWidgetItem* item2 = new QTableWidgetItem("X: "+QString::number(p.X())+
+		"  | Y: " + QString::number(p.Y()) + " | Z: " + QString::number(p.Z()));
+	myTab->setItem(1, 0, item2);
+	myTab->setRowHeight(1, 35);
+
+	QTableWidgetItem* item3 = new QTableWidgetItem(QString::number(aDoc->getListOfShapes().at(aDoc->Shapeid)->getTotalArea()));
+	myTab->setItem(2, 0, item3);
+	myTab->setRowHeight(2, 35);
+
+	QTableWidgetItem* item4 = new QTableWidgetItem(QString::number(aDoc->getListOfShapes().at(aDoc->Shapeid)->getVolume()));
+	myTab->setItem(3, 0, item4);
+	myTab->setRowHeight(3, 35);
+
+	double dimX = aDoc->getListOfShapes().at(aDoc->Shapeid)->getXDim();
+	double dimY = aDoc->getListOfShapes().at(aDoc->Shapeid)->getYDim();
+	double dimZ = aDoc->getListOfShapes().at(aDoc->Shapeid)->getZDim();
+
+	QTableWidgetItem* item5 = new QTableWidgetItem("X: "+QString::number(dimX)+
+		"  | Y: " + QString::number(dimY) +"  | Z: " + QString::number(dimZ));
+	myTab->setItem(4, 0, item5);
+	myTab->setRowHeight(4, 35);
+
+	QTableWidgetItem* item6 = new QTableWidgetItem(QString::number(aDoc->getListOfShapes().at(aDoc->Shapeid)->getFaceCount()));
+	myTab->setItem(5, 0, item6);
+	myTab->setRowHeight(5, 35);
+
+	shapePropsDialog->show();
+}

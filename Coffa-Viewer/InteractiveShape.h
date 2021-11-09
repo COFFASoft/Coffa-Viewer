@@ -12,6 +12,8 @@
 #include <BRepBndLib.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <gp_Quaternion.hxx>
+#include <GProp_GProps.hxx>
+#include <BRepGProp.hxx>
 
 #include <QtCore/QList>
 #include <QtCore/QString>
@@ -55,8 +57,6 @@ public:
 	void setName(QString aName);
 	QString getName();
 
-	QStandardItem *getTreeItem();
-
 	Handle(AIS_InteractiveObject) getInteractiveObject();
 
 	void removeAllInteractives();
@@ -65,7 +65,14 @@ public:
 	double currentRy();
 	double currentRz();
 
+	gp_Pnt getCenter();
+
 	double getTotalArea();
+	double getVolume();
+	double getFaceCount();
+	double getXDim();
+	double getYDim();
+	double getZDim();
 	void rotateShape(gp_Quaternion aQuaternion, double angx, double angy, double angz);
 	void translatePart(double mx, double my, double mz);
 	QList<QList<gp_Pnt>> sliceTriangle(gp_Pnt Pnt1, gp_Pnt Pnt2, gp_Pnt Pnt3, gp_Dir aNormal,
@@ -81,19 +88,17 @@ public:
 	double Tx, Ty, Tz;
 private:
 	TopoDS_Shape theShape;
-	TopoDS_Shape theProcessingShape;
 	TopoDS_Shape theOriginShape;
 	Doc* theDoc;
 	QString ID;
 	QString theName;
 	QList<InteractiveSurface*> theOriginSurfaces;
 	
-	
-
 	bool alreadyComputedArea;
 	double thetotalArea;
 
-	QStandardItem *mainItem, *geomItem;
+	bool alreadyComputedVolume;
+	double theVolume;
 
 	gp_Quaternion rotQuaternion;
 	gp_Vec trlVector;

@@ -20,5 +20,6 @@
         <file>Resources/Top.png</file>
         <file>Resources/Grid.png</file>
         <file>Resources/Reset.png</file>
+        <file>Resources/shapeInfo.png</file>
     </qresource>
 </RCC>

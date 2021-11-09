@@ -54,8 +54,8 @@
 #include <QtCore/QStringListModel>
 #include <QtWidgets/QDial>
 #include <QtWidgets/QWidgetAction>
-#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QTableWidget>
 
 
 class CoffaViewer : public QMainWindow
@@ -76,8 +76,6 @@ public:
 	void						createRotationDialog();
 	void						createTranslationDialog();
 
-	
-
 public slots:
 	void						onImportPart();
 	void						onExport();
@@ -94,9 +92,11 @@ public slots:
 	void						onRotate();
 
 	void						onShowTrlDialog();
-	void onTranslate();
+	void						onTranslate();
 
 	void						onAxisChanged();
+
+	void						onShowShapeProps();
 
 protected:
 	virtual void                    resizeEvent(QResizeEvent*);
@@ -110,7 +110,7 @@ private:
 	QWidget* shapeSelectionWidget;
 	QVBoxLayout* shapeSelectionLayout;
 	QScrollArea* shapeSelectionScroller;
-	QList<QCheckBox*> checkBoxList; //For selecting a shape on the left side widget (shapeSelectionWidget)
+	QList<QRadioButton*> radioButtonList; //For selecting a shape on the left side widget (shapeSelectionWidget)
 
 	QToolBar* mainToolBar, *viewToolBar; //Tool bars
 	bool viewToolsDone=false; //To check whether viewer tools have been built
@@ -122,6 +122,11 @@ private:
 	QPushButton* goExportButton;
 
 	QMenu* ShapeProp; //Menu of shape that shows up in the viewer
+	QDialog* shapePropsDialog;
+	QLabel* nameLabel;
+	QLabel* areaLabel;
+	QLabel* volumeLabel;
+	QLabel* dimLabel;
 
 	////Rotation and Translation Dialog Boxes////
 	QDialog* RotDialog, * TrlDialog; 
