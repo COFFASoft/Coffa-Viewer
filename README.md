@@ -1,5 +1,5 @@
 # Coffa-Viewer
-An Open Source 3D Viewer (Part of COFFA Project which aimed at designing Knowledge-Based CAM Tools for Additive Manufacturing) based on Opencascade.
+An Open Source 3D Viewer (Part of COFFA Project from [GSCOP Laboratory](https://g-scop.grenoble-inp.fr/en/research/product-process-design)) based on Opencascade.
 ![image](https://user-images.githubusercontent.com/64405374/142596169-0f65ed11-093f-4b4b-8367-be227ea559f5.png)
 
 You can clone and customize the CoffaViewer with respect to your context. You can also contribute to improve the tool.
@@ -30,3 +30,9 @@ The tool can display the following properties for a shape:
 - Overhanging Detection
 - Support Structures Generation
 - Slicing & Tool Path Generation
+
+## LICENSE
+Coffa Viewer is General Public Licensed (v3.0), as found in [LICENSE](LICENSE) file
+## More Information
+(LinkedIn: https://www.linkedin.com/in/mouhamadou-mansour-mbow-bb4b7684/)
+(Google Scholar: https://scholar.google.com/citations?user=Ehyud-MAAAAJ&hl=fr)
