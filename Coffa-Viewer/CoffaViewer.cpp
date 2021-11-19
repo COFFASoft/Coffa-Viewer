@@ -342,7 +342,12 @@ void CoffaViewer::onImportPart()
 
 	if (!fileName.isEmpty())
 	{
+		theNotifier = new NotificationWidget("Reading Shape Data...");
+		theNotifier->setParent(this);
+		theNotifier->move(this->width() - 370, this->height() - 170);
+		theNotifier->show();
 		QApplication::processEvents();
+
 		aDoc->AddPart(fileName);
 		aDoc->Shapeid = aDoc->getListOfShapes().size() - 1;
 		shapeSelectionScroller->show();
@@ -357,6 +362,9 @@ void CoffaViewer::onImportPart()
 		shapeSelectionWidget->setFixedHeight(newHeight);
 		if (newHeight < 450)
 			shapeSelectionScroller->setFixedHeight(newHeight + 10);
+
+		theNotifier->setMessage("Ready");
+		QTimer::singleShot(1500, theNotifier, SLOT(close()));
 	}
 }
 
@@ -376,6 +384,12 @@ void CoffaViewer::onExport()
 
 		if (!fileName.isNull())
 		{
+			theNotifier = new NotificationWidget("Exporting Shape...");
+			theNotifier->setParent(this);
+			theNotifier->move(this->width() - 370, this->height() - 170);
+			theNotifier->show();
+			QApplication::processEvents();
+
 			if (aSuffix == "stl")
 			{
 				QByteArray ba = fileName.toLatin1();
@@ -396,6 +410,9 @@ void CoffaViewer::onExport()
 				aFile = ba.data();
 				aDoc->ExportFileBRep(aFile, ind);
 			}
+
+			theNotifier->setMessage("Ready");
+			QTimer::singleShot(1500, theNotifier, SLOT(close()));
 		}
 	}
 
@@ -414,6 +431,13 @@ void CoffaViewer::onRemovePart()
 
 	if (ind > -1 && ind < aDoc->getListOfShapes().size() && !radioButtonList.isEmpty())
 	{
+		theNotifier = new NotificationWidget("Removing Shape...");
+		theNotifier->setWindowModality(Qt::NonModal);
+		theNotifier->setParent(this);
+		theNotifier->move(this->width() - 370, this->height() - 170);
+		theNotifier->show();
+		QApplication::processEvents();
+
 		shapeSelectionLayout->removeWidget(radioButtonList[ind]);
 		delete radioButtonList[ind];
 		radioButtonList.removeAt(ind);
@@ -423,6 +447,8 @@ void CoffaViewer::onRemovePart()
 		if (newHeight < 450)
 			shapeSelectionScroller->setFixedHeight(newHeight + 10);
 
+		theNotifier->setMessage("Successfully Removed");
+		QTimer::singleShot(2000, theNotifier, SLOT(close()));
 	}
 
 	if (!radioButtonList.isEmpty())

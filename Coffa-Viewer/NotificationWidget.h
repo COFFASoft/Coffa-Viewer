@@ -4,7 +4,6 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QGraphicsDropShadowEffect>
-#include <QtGui/QMovie>
 
 class NotificationWidget : public QDialog
 {

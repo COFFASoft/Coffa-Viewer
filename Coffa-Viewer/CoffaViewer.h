@@ -3,6 +3,7 @@
 #include "Doc.h"
 #include "View.h"
 #include "InteractiveShape.h"
+#include "NotificationWidget.h"
 
 //Opencascade
 #include <StlAPI.hxx>
@@ -137,4 +138,6 @@ private:
 	QDoubleSpinBox* TxSpin, * TySpin, * TzSpin;
 
 	int theAxis1=1, theAxis2=2, theSequence=1;
+
+	NotificationWidget* theNotifier;
 };
