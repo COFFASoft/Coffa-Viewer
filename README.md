@@ -1,4 +1,5 @@
-# Please cite this work as: Coffa-ANR-GSCOP-Grenoble :-)
+## Please cite this work as: Coffa-ANR-GSCOP-Grenoble 😊
+Give it a star ★
 # Coffa-Viewer Description
 An Open Source 3D Viewer (Part of COFFA Project from [GSCOP Laboratory](https://g-scop.grenoble-inp.fr/en/research/product-process-design)) based on Opencascade.
 ![image](https://user-images.githubusercontent.com/64405374/142596169-0f65ed11-093f-4b4b-8367-be227ea559f5.png)
